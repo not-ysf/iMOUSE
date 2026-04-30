@@ -1,0 +1,50 @@
+name: Build iMouse IPA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # allow manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: macos-14  # Apple Silicon runner with Xcode 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build (unsigned)
+        run: |
+          xcodebuild \
+            -project iMouse.xcodeproj \
+            -scheme iMouse \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination generic/platform=iOS \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CONFIGURATION_BUILD_DIR=$PWD/build \
+            clean build
+
+      - name: Package as IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/iMouse.app Payload/iMouse.app
+          zip -r iMouse.ipa Payload
+          echo "✅ IPA created: iMouse.ipa"
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iMouse-IPA
+          path: iMouse.ipa
+          retention-days: 30

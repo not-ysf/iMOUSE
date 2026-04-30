@@ -471,7 +471,7 @@ struct SettingSlider: View {
                     .foregroundColor(accent)
             }
             Slider(value: $value, in: range)
-                .tint(accent)
+                .accentColor(accent)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 8)
@@ -489,7 +489,7 @@ struct SettingToggle: View {
                 .foregroundColor(.white)
             Spacer()
             Toggle("", isOn: $value)
-                .tint(accent)
+                .accentColor(accent)
                 .labelsHidden()
         }
         .padding(.horizontal, 20)
